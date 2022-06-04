@@ -10,6 +10,8 @@
 //const { groupBy } = require("cypress/types/lodash")
 
 describe('Central de Atendimento ao Cliente TAT', function() {
+    const THREE_SECONDS_IN_MS = 3000 //variavel que define a quantidade de tempo
+
     beforeEach(function() {
         cy.visit('./src/index.html')
     })
@@ -20,6 +22,9 @@ describe('Central de Atendimento ao Cliente TAT', function() {
     
     it('preenche os campos obrigatórios e envia o formulário', function(){
         const longText = 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.'
+        
+        cy.clock() //usado para parar o clock e executar os testes
+
         cy.get('#firstName').type('Jean')
         cy.get('#lastName').type('Carlos')
         cy.get('#email').type('jean@exemplo.com')
@@ -28,9 +33,14 @@ describe('Central de Atendimento ao Cliente TAT', function() {
 
         cy.get('.success').should('be.visible')
 
+        cy.tick(THREE_SECONDS_IN_MS) //verifica a mensagem que aparece sem perder tempo
+        cy.get('.success').should('not.be.visible')
+
     })
 
     it('exibe mensagem de erro ao submeter o formulário com um email com formatação inválida', function(){
+        cy.clock()
+
         cy.get('#firstName').type('Jean')
         cy.get('#lastName').type('Carlos')
         cy.get('#email').type('jean@exemplo,com')
@@ -38,6 +48,9 @@ describe('Central de Atendimento ao Cliente TAT', function() {
         cy.contains('button', 'Enviar').click()
 
         cy.get('.error').should('be.visible')
+
+        cy.tick(THREE_SECONDS_IN_MS)
+        cy.get('.error').should('not.be.visible')
     })
 
     it('campo telefone continua vazio quando preenchido com valor não numerico', function(){
@@ -47,6 +60,8 @@ describe('Central de Atendimento ao Cliente TAT', function() {
     })
 
     it('exibe mensagem de erro quando o telefone se torna obrigatório mas não é preenchido antes do envio do formulário', function(){
+        cy.clock()
+        
         cy.get('#firstName').type('Jean')
         cy.get('#lastName').type('Carlos')
         cy.get('#email').type('jean@exemplo.com')
@@ -55,6 +70,9 @@ describe('Central de Atendimento ao Cliente TAT', function() {
         cy.contains('button', 'Enviar').click()
 
         cy.get('.error').should('be.visible')
+
+        cy.tick(THREE_SECONDS_IN_MS)
+        cy.get('.error').should('not.be.visible')
     })
 
     it('preenche e limpa os campos nome, sobrenome, email e telefone', function(){
@@ -81,15 +99,25 @@ describe('Central de Atendimento ao Cliente TAT', function() {
     })
 
     it('exibe mensagem de erro ao submeter o formulário sem preencher os campos obrigatórios', function(){
+        cy.clock()
+
         cy.contains('button', 'Enviar').click()
 
         cy.get('.error').should('be.visible')
+        
+        cy.tick(THREE_SECONDS_IN_MS)
+        cy.get('.error').should('not.be.visible')
     })
 
     it('envia o formuário com sucesso usando um comando customizado', function(){
+        cy.clock()
+
         cy.fillMandatoryFieldsAndSubmit()
 
         cy.get('.success').should('be.visible')
+        
+        cy.tick(THREE_SECONDS_IN_MS)
+        cy.get('.success').should('not.be.visible')
     })
 
     it('seleciona um produto (YouTube) por seu texto', function(){
